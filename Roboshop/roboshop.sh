@@ -2,7 +2,7 @@
 
 AMI_ID="ami-09c813fb71547fc4f"
 SG_ID="sg-0796ffab4fe100077" # replace with your SG ID
-ZONE_ID="Z0948150OFPSYTNVYZOY" # replace with your ID
+ZONE_ID="Z05166562P910VXJWOR8Y" # replace with your ID
 DOMAIN_NAME="karela.fun"
 
 for instance in $@ # mongodb redis mysql
@@ -15,7 +15,7 @@ do
         RECORD_NAME="$instance.$DOMAIN_NAME" # mongodb.daws86s.fun
     else
         IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
-        RECORD_NAME="$DOMAIN_NAME" # karela.fun
+        RECORD_NAME="$DOMAIN_NAME" # daws86s.fun
     fi
 
     echo "$instance: $IP"
