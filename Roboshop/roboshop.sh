@@ -16,9 +16,11 @@ if [ $instance != "frontend" ]; then
         IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
         RECORD_NAME="$DOMAIN_NAME" # karela.fun
     fi
+#echo $IP
+#echo $RECORD_NAME
 	echo "$instance: $IP"
       aws route53 change-resource-record-sets \
-    --hosted-zone-id $Z05166562P910VXJWOR8Y \
+    --hosted-zone-id $ZONE_ID \
     --change-batch '
     {
         "Comment": "Updating record set"
