@@ -2,7 +2,7 @@
 
 AMI_ID="ami-09c813fb71547fc4f"
 SG_ID="sg-0796ffab4fe100077"  #REPLACE WITH YOU SG ID
-
+ZONE_ID="Z05166562P910VXJWOR8Y"
 for instance in $@  #declaring all the instances
 do
 INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --instance-type t3.micro --security-group-ids $SG_ID --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$instance}]" --query 'Instances[0].InstanceId' --output text)
@@ -16,4 +16,21 @@ if [ $instance != "frontend" ]; then
         RECORD_NAME="$DOMAIN_NAME" # karela.fun
     fi
 	echo "$instance: $IP"
+      aws route53 change-resource-record-sets \
+    --hosted-zone-id $ZONE_ID \
+    --change-batch '
+    {
+        "Comment": "Updating record set"
+        ,"Changes": [{
+        "Action"              : "UPSERT"
+        ,"ResourceRecordSet"  : {
+            "Name"              : "'$RECORD_NAME'"
+            ,"Type"             : "A"
+            ,"TTL"              : 1
+            ,"ResourceRecords"  : [{
+                "Value"         : "'$IP'"
+            }]
+        }
+        }]
+    }
 done
