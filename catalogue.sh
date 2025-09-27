@@ -8,6 +8,7 @@ N="\e[0m"
 
 LOGS_FOLDER="/var/log/shell-script"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
+SCRIPT_DIR=$(pwd)
 MONGODB_HOST=mongodb.karela.fun
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log" # /var/log/shell-script/16-logs.log
 
@@ -59,7 +60,7 @@ validate $? "Changing directory to /app"
 npm install &>>$LOG_FILE
 validate $? "Installing nodejs dependencies"
 
-cp catalogue.service /etc/systemd/system/catalogue.service
+cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service
 validate $? "Copying catalogue systemd file"
 
 systemctl daemon-reload &>>$LOG_FILE
