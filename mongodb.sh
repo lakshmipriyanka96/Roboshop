@@ -26,7 +26,7 @@ validate(){ # functions receive inputs through args just like shell script args
         echo -e "$2 ... $G SUCCESS $N" | tee -a $LOG_FILE
     fi
 }
-cp mongo.db /etc/yum.repos.d/mongo.repo
+cp mongo.repo /etc/yum.repos.d/mongo.repo
 validate $? "Adding mongo repo file"
 
 dnf install mongodb-org -y &>>$LOG_FILE
