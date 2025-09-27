@@ -80,7 +80,7 @@ validate $? "Starting catalogue service"
 systemctl status catalogue &>>$LOG_FILE
 validate $? "Checking status of catalogue service"
 
-cp mongo.repo /etc/yum.repos.d/mongo.repo   
+cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo   
 validate $? "Adding mongo repo file"
 
 dnf install mongodb-mongosh -y &>>$LOG_FILE 
