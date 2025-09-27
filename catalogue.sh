@@ -80,8 +80,13 @@ validate $? "Adding mongo repo file"
 dnf install mongodb-mongosh -y &>>$LOG_FILE 
 validate $? "Installing mongo shell"
 
-mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOG_FILE
-validate $? "Loading catalogue schema"
+INDEX=$(mongosh mongodb.karela.fun --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
+if [ $INDEX -le 0 ]; then
+    mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOG_FILE
+    VALIDATE $? "Load catalogue products"
+else
+    echo -e "Catalogue products already loaded ... $Y SKIPPING $N"
+fi
 
 systemctl restart catalogue &>>$LOG_FILE
 validate $? "Restarting catalogue service"
