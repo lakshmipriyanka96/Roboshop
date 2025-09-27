@@ -39,10 +39,14 @@ validate $? "Enabling nodejs 20 module"
 dnf install nodejs -y &>>$LOG_FILE
 validate $? "Installing nodejs"
 
-useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
-validate $? "Adding roboshop user" &>>$LOG_FILE
+id roboshop
+if [ $? -ne 0 ]; then
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+else
+    echo "roboshop user already exists....$Y SKIPPING $N"
+fi 
 
-mkdir /app &>>$LOG_FILE
+mkdir -p /app &>>$LOG_FILE
 validate $? "Creating app directory"
 
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
