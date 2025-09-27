@@ -5,10 +5,10 @@ Description = Catalogue Service
 User=roboshop
 Environment=MONGO=true
 // highlight-start
-Environment=MONGO_URL="mongodb://<MONGODB-SERVER-IPADDRESS>:27017/catalogue"
+Environment=MONGO_URL="mongodb://mongodb.karela.fun:27017/catalogue"
 // highlight-end
 ExecStart=/bin/node /app/server.js
 SyslogIdentifier=catalogue
 
 [Install]
-WantedBy=multi-user.target[A[A[A[A[A[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cmongodb.karela.fun[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[:27017/catalogue"[B[B[B[B[B[B[B[B[B[B[B[B[B[B[B[B[B[B[B
+WantedBy=multi-user.target
