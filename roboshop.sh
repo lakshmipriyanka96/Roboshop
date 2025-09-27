@@ -1,7 +1,7 @@
 #!/bin/bash
 
 AMI_ID="ami-09c813fb71547fc4f"
-SG_ID="sg-0796ffab4fe100077" # replace with your SG ID
+SG_ID="sg-0669f1c03bc9e5482" # replace with your SG ID
 ZONE_ID="Z05166562P910VXJWOR8Y" # replace with your ID
 DOMAIN_NAME="karela.fun"
 
