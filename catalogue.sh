@@ -61,9 +61,6 @@ validate $? "Cleaning up app directory"
 unzip /tmp/catalogue.zip &>>$LOG_FILE
 validate $? "Extracting catalogue code"
 
-cd /app
-validate $? "Changing directory to /app"
-
 npm install &>>$LOG_FILE
 validate $? "Installing nodejs dependencies"
 
@@ -76,12 +73,6 @@ validate $? "Reloading systemd"
 systemctl enable catalogue &>>$LOG_FILE
 validate $? "Enabling catalogue service"
 
-
-systemctl start catalogue &>>$LOG_FILE
-validate $? "Starting catalogue service"
-
-systemctl status catalogue &>>$LOG_FILE
-validate $? "Checking status of catalogue service"
 
 cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo   
 validate $? "Adding mongo repo file"
