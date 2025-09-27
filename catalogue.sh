@@ -55,7 +55,7 @@ validate $? "Downloading catalogue code"
 cd /app 
 validate $? "Changing directory to /app"
 
-rm-rf /app/* &>>$LOG_FILE
+rm -rf /app/* &>>$LOG_FILE
 validate $? "Cleaning up app directory"
 
 unzip /tmp/catalogue.zip &>>$LOG_FILE
