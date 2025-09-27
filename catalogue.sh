@@ -6,9 +6,9 @@ G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
 
-LOGS_FOLDER="/var/log/shell-script"
+LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
-SCRIPT_DIR=$(pwd)
+SCRIPT_DIR=$PWD
 MONGODB_HOST=mongodb.karela.fun
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log" # /var/log/shell-script/16-logs.log
 
@@ -20,7 +20,7 @@ if [ $USERID -ne 0 ]; then
     exit 1 # failure is other than 0
 fi
 
-validate(){ # functions receive inputs through args just like shell script args
+VALIDATE(){ # functions receive inputs through args just like shell script args
     if [ $1 -ne 0 ]; then
         echo -e "$2 ... $R FAILURE $N" | tee -a $LOG_FILE
         exit 1
@@ -29,61 +29,60 @@ validate(){ # functions receive inputs through args just like shell script args
     fi
 }
 
-####Nodejs Application
-dnf module disable nodejs -y
-validate $? "Disabling nodejs module"
-
-dnf module enable nodejs:20 -y
-validate $? "Enabling nodejs 20 module"
-
+##### NodeJS ####
+dnf module disable nodejs -y &>>$LOG_FILE
+VALIDATE $? "Disabling NodeJS"
+dnf module enable nodejs:20 -y  &>>$LOG_FILE
+VALIDATE $? "Enabling NodeJS 20"
 dnf install nodejs -y &>>$LOG_FILE
-validate $? "Installing nodejs"
+VALIDATE $? "Installing NodeJS"
 
-id roboshop
+id roboshop &>>$LOG_FILE
 if [ $? -ne 0 ]; then
-    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
+    VALIDATE $? "Creating system user"
 else
-    echo "roboshop user already exists....$Y SKIPPING $N"
-fi 
+    echo -e "User already exist ... $Y SKIPPING $N"
+fi
 
-mkdir -p /app &>>$LOG_FILE
-validate $? "Creating app directory"
+mkdir -p /app
+VALIDATE $? "Creating app directory"
 
-curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
-validate $? "Downloading catalogue code"
+curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>>$LOG_FILE
+VALIDATE $? "Downloading catalogue application"
 
 cd /app 
-validate $? "Changing directory to /app"
+VALIDATE $? "Changing to app directory"
 
-rm -rf /app/* &>>$LOG_FILE
-validate $? "Cleaning up app directory"
+rm -rf /app/*
+VALIDATE $? "Removing existing code"
 
 unzip /tmp/catalogue.zip &>>$LOG_FILE
-validate $? "Extracting catalogue code"
+VALIDATE $? "unzip catalogue"
 
 npm install &>>$LOG_FILE
-validate $? "Installing nodejs dependencies"
+VALIDATE $? "Install dependencies"
 
 cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service
-validate $? "Copying catalogue systemd file"
+VALIDATE $? "Copy systemctl service"
 
-systemctl daemon-reload &>>$LOG_FILE
-validate $? "Reloading systemd"
-
+systemctl daemon-reload
 systemctl enable catalogue &>>$LOG_FILE
-validate $? "Enabling catalogue service"
+VALIDATE $? "Enable catalogue"
 
+cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
+VALIDATE $? "Copy mongo repo"
 
-cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo   
-validate $? "Adding mongo repo file"
+dnf install mongodb-mongosh -y &>>$LOG_FILE
+VALIDATE $? "Install MongoDB client"
 
-dnf install mongodb-mongosh -y &>>$LOG_FILE 
-validate $? "Installing mongo shell"
+INDEX=$(mongosh mongodb.daws86s.fun --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
+if [ $INDEX -le 0 ]; then
+    mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOG_FILE
+    VALIDATE $? "Load catalogue products"
+else
+    echo -e "Catalogue products already loaded ... $Y SKIPPING $N"
+fi
 
-    mongosh --host $MONGODB_HOST </app/db/master-data.js 
-    validate $? "Load catalogue products"
-
-systemctl restart catalogue &>>$LOG_FILE
-validate $? "Restarting catalogue service"
-
-
+systemctl restart catalogue
+VALIDATE $? "Restarted catalogue"
